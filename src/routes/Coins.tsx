@@ -8,6 +8,15 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 const Header = styled.header``;
+const Loader = styled.div`
+  text-align: center;
+  padding: 50px 0px;
+`;
+const Title = styled.h1`
+  color: ${(props) => props.theme.accentColor};
+  font-size: 48px;
+  text-align: center;
+`;
 const CoinsList = styled.ul``;
 const Coin = styled.li`
   background-color: ${(props) => props.theme.textColor};
@@ -28,17 +37,11 @@ const Coin = styled.li`
     }
   }
 `;
-const Title = styled.h1`
-  color: ${(props) => props.theme.accentColor};
-  font-size: 48px;
-  text-align: center;
-`;
 
-const Loader = styled.div`
-  text-align: center;
-  padding: 50px 0px;
+const ImgContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;
-
 const Img = styled.img`
   width: 30px;
   height: 30px;
@@ -60,9 +63,10 @@ function Coins() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
-      const response = await fetch("https://api.coinpaprika.com/v1/coins");
-      const json = await response.json();
-      setCoins(json.slice(0, 100));
+      const data = await (
+        await fetch("https://api.coinpaprika.com/v1/coins")
+      ).json();
+      setCoins(data.slice(0, 100));
       setLoading(false);
     })();
   }, []);
@@ -77,13 +81,18 @@ function Coins() {
         <CoinsList>
           {coins.map((coin) => (
             <Coin key={coin.id}>
-              <Link to={`/${coin.id}`}>
-                <div style={{ display: "flex", alignItems: "center" }}>
+              <Link
+                to={{
+                  pathname: `/${coin.id}`,
+                  state: { name: coin.name },
+                }}
+              >
+                <ImgContainer>
                   <Img
                     src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`}
                   />
                   {coin.name}
-                </div>
+                </ImgContainer>
                 <div>➔</div>{" "}
               </Link>
             </Coin>

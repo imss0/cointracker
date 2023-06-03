@@ -1,5 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import Router from "./Router";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;700;900&display=swap');
@@ -58,7 +59,9 @@ const GlobalStyle = createGlobalStyle`
   }
   a {
     text-decoration: none;
-    color: inherit;
+  }
+  a:visited {
+    text-decoration: none;
   }
 `;
 
@@ -67,6 +70,7 @@ function App() {
     <>
       <GlobalStyle />
       <Router />
+      <ReactQueryDevtools initialIsOpen={true} />
     </>
   );
 }

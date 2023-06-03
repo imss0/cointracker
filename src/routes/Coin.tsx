@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import {
+  Link,
+  Switch,
+  Route,
+  useParams,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
 import styled from "styled-components";
+import Price from "./Price";
+import Chart from "./Chart";
 
 const Container = styled.div`
   padding: 10px 20px;
@@ -17,6 +26,48 @@ const Title = styled.h1`
   font-size: 48px;
   text-align: center;
 `;
+
+const Overview = styled.div`
+  display: flex;
+  justify-content: space-between;
+  background-color: black;
+  padding: 10px 20px;
+  border-radious: 10px;
+`;
+
+const OverviewItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  span: first-child {
+    font-size: 10px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+`;
+
+const Tabs = styled.div`
+  margin: 10px;
+  justify-content: center;
+  display: flex;
+  max-width: 480px;
+`;
+const Tab = styled.div<{ isActive: boolean }>`
+  background-color: ${(props) =>
+    props.isActive ? props.theme.accentColor : "black"};
+  padding: 15px;
+  margin: 10px;
+  width: 100px;
+  text-align: center;
+  border-radius: 10px;
+  a {
+    color: ${(props) => props.theme.textColor};
+  }
+  a:visited {
+    color: ${(props) => props.theme.textColor};
+  }
+`;
+
 interface Params {
   coinId: string;
 }
@@ -86,6 +137,8 @@ function Coin() {
   const { state } = useLocation<State>();
   const [info, setInfo] = useState<InfoData>();
   const [price, setPrice] = useState<PriceData>();
+  const priceMatch = useRouteMatch("/:coinId/price");
+  const chartMatch = useRouteMatch("/:coinId/chart");
   useEffect(() => {
     (async () => {
       const infoData = await (
@@ -99,14 +152,30 @@ function Coin() {
       setLoading(false);
     })();
   }, []);
-  console.log(info);
-  console.log(price);
   return (
     <Container>
       <Header>
-        <Title>{state?.name || "Loading"}</Title>
+        <Title>
+          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+        </Title>
       </Header>
       {loading ? <Loader>Loading...</Loader> : null}
+      <Tabs>
+        <Tab isActive={chartMatch !== null}>
+          <Link to={`/${coinId}/chart`}>Chart </Link>
+        </Tab>
+        <Tab isActive={priceMatch !== null}>
+          <Link to={`/${coinId}/price`}>Price </Link>
+        </Tab>
+      </Tabs>
+      <Switch>
+        <Route path={`/${coinId}/price`}>
+          <Price />
+        </Route>
+        <Route path={`/${coinId}/chart`}>
+          <Chart />
+        </Route>
+      </Switch>
     </Container>
   );
 }

@@ -1,12 +1,7 @@
-import { useState, useEffect } from "react";
-import {
-  Link,
-  Switch,
-  Route,
-  useParams,
-  useLocation,
-  useRouteMatch,
-} from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useQuery } from "react-query";
+import { getPrice, getInfo } from "../api";
+import { Link, Switch, Route, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
 import Price from "./Price";
 import Chart from "./Chart";
@@ -25,25 +20,6 @@ const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
   font-size: 48px;
   text-align: center;
-`;
-
-const Overview = styled.div`
-  display: flex;
-  justify-content: space-between;
-  background-color: black;
-  padding: 10px 20px;
-  border-radious: 10px;
-`;
-
-const OverviewItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  span: first-child {
-    font-size: 10px;
-    font-weight: 500;
-    margin-bottom: 5px;
-  }
 `;
 
 const Tabs = styled.div`
@@ -71,10 +47,6 @@ const Tab = styled.div<{ isActive: boolean }>`
 interface Params {
   coinId: string;
 }
-interface State {
-  name: string;
-}
-
 interface InfoData {
   id: string;
   name: string;
@@ -132,34 +104,33 @@ interface PriceData {
 }
 
 function Coin() {
-  const [loading, setLoading] = useState(true);
   const { coinId } = useParams<Params>();
-  const { state } = useLocation<State>();
-  const [info, setInfo] = useState<InfoData>();
-  const [price, setPrice] = useState<PriceData>();
+  const { isLoading: priceLoading, data: priceData } = useQuery<PriceData>(
+    ["priceData", coinId],
+    () => getPrice(coinId)
+  );
+  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+    ["infoData", coinId],
+    () => getInfo(coinId)
+  );
+
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPrice(priceData);
-      setLoading(false);
-    })();
-  }, []);
+
+  const isLoading = priceLoading || infoLoading;
+  console.log(priceData);
   return (
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+          {priceData?.name
+            ? priceData?.name
+            : isLoading
+            ? "Loading..."
+            : infoData?.name}
         </Title>
       </Header>
-      {loading ? <Loader>Loading...</Loader> : null}
+      {isLoading ? <Loader>Loading...</Loader> : null}
       <Tabs>
         <Tab isActive={chartMatch !== null}>
           <Link to={`/${coinId}/chart`}>Chart </Link>
@@ -173,7 +144,7 @@ function Coin() {
           <Price />
         </Route>
         <Route path={`/${coinId}/chart`}>
-          <Chart />
+          <Chart coinId={coinId} />
         </Route>
       </Switch>
     </Container>

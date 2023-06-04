@@ -118,7 +118,7 @@ function Coin() {
   const chartMatch = useRouteMatch("/:coinId/chart");
 
   const isLoading = priceLoading || infoLoading;
-  console.log(priceData);
+
   return (
     <Container>
       <Header>

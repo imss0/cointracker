@@ -8,9 +8,6 @@ function Chart({ coinId }: ChartProps) {
   const { isLoading, data } = useQuery(["history", coinId], () =>
     getPrice(coinId)
   );
-  if (!isLoading) {
-    console.log(data);
-  }
   return <h1>CHART</h1>;
 }
 

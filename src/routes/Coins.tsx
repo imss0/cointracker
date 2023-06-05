@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import { getCoins } from "../api";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "../atoms";
 
 const Container = styled.div`
   padding: 10px 20px;
@@ -63,11 +65,14 @@ interface ICoin {
 }
 
 function Coins() {
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const toggleDarkAtom = () => setDarkAtom((curr) => !curr);
   const { isLoading, data } = useQuery<ICoin[]>("Coins", getCoins);
   return (
     <Container>
       <Header>
         <Title>Coins</Title>
+        <button onClick={toggleDarkAtom}>Dark / Light Mode</button>
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>

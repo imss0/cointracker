@@ -29,19 +29,18 @@ const Tabs = styled.div`
   max-width: 480px;
 `;
 const Tab = styled.div<{ isActive: boolean }>`
-  background-color: ${(props) => props.theme.btnColor};
+  background-color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
   padding: 15px;
   margin: 10px;
   width: 100px;
   text-align: center;
   border-radius: 10px;
   a {
-    color: ${(props) =>
-      props.isActive ? props.theme.accentColor : props.theme.textColor};
+    color: ${(props) => props.theme.bgColor};
   }
   a:visited {
-    color: ${(props) =>
-      props.isActive ? props.theme.accentColor : props.theme.textColor};
+    color: ${(props) => props.theme.bgColor};
   }
 `;
 
